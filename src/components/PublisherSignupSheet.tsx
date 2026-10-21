@@ -370,23 +370,19 @@ export function PublisherSignupSheet({
 
               <Pressable
                 onPress={handleSubmit}
-                disabled={phase === "loading"}
-                style={[styles.submitButton, phase === "loading" && styles.submitButtonDisabled]}
+                disabled={false}
+                style={styles.submitButton}
                 accessibilityRole="button"
                 accessibilityLabel="Create publisher account"
-                accessibilityState={{ disabled: phase === "loading", busy: phase === "loading" }}
+                accessibilityState={{ disabled: false, busy: false }}
               >
-                {phase === "loading" ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Text style={styles.submitButtonText}>Create Account</Text>
-                )}
+                <Text style={styles.submitButtonText}>Create Account</Text>
               </Pressable>
 
               <Pressable
                 onPress={onClose}
                 disabled={phase === "loading"}
-                style={[styles.cancelButton, phase === "loading" && styles.submitButtonDisabled]}
+                style={styles.cancelButton}
                 accessibilityRole="button"
                 accessibilityLabel="Cancel"
               >
