@@ -312,9 +312,8 @@ export function PublisherSignupSheet({
                   style={[styles.input, errors.name && styles.inputError]}
                   autoCapitalize="words"
                   autoCorrect={false}
-                  editable={phase !== "loading"}
+                  editable
                   accessibilityLabel="Publisher name"
-                  accessibilityErrorMessage={touched.name ? errors.name : undefined}
                 />
                 {touched.name && errors.name && (
                   <Text style={styles.errorText} accessibilityLiveRegion="assertive">
@@ -337,7 +336,6 @@ export function PublisherSignupSheet({
                   keyboardType="email-address"
                   editable={phase !== "loading"}
                   accessibilityLabel="Email address"
-                  accessibilityErrorMessage={touched.email ? errors.email : undefined}
                 />
                 {touched.email && errors.email && (
                   <Text style={styles.errorText} accessibilityLiveRegion="assertive">
@@ -359,7 +357,6 @@ export function PublisherSignupSheet({
                   autoCorrect={false}
                   editable={phase !== "loading"}
                   accessibilityLabel="Stellar wallet address"
-                  accessibilityErrorMessage={touched.walletAddress ? errors.walletAddress : undefined}
                 />
                 {touched.walletAddress && errors.walletAddress && (
                   <Text style={styles.errorText} accessibilityLiveRegion="assertive">
@@ -408,7 +405,7 @@ export function PublisherSignupSheet({
           {phase === "success" && (
             <View style={styles.successContainer}>
               <Text style={styles.successTitle}>Account Created!</Text>
-              <Text style={typography.body} textAlign="center">
+              <Text style={[typography.body, { textAlign: "center" }]}>
                 Your publisher account is ready. Copy your API key now — it won't be shown again.
               </Text>
 
