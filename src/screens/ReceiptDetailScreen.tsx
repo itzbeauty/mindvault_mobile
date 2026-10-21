@@ -405,7 +405,6 @@ export function ReceiptDetailScreen({ route, navigation }: Props) {
           <View style={styles.actionRow}>
             <Pressable
               onPress={handleOpenExplorer}
-              style={styles.actionButton}
               style={[styles.actionButton, styles.actionButtonSecondary]}
               accessibilityRole="button"
               accessibilityLabel="View transaction on Stellar Expert"
