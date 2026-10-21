@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -229,7 +228,7 @@ function getVerificationStatus(
 }
 
 export function ReceiptDetailScreen({ route, navigation }: Props) {
-  const { colors, shared, typography } = useAppTheme();
+  const { colors, shared } = useAppTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const { txHash } = route.params;
@@ -257,7 +256,6 @@ export function ReceiptDetailScreen({ route, navigation }: Props) {
       const message = err instanceof Error ? err.message : "Failed to fetch server receipt";
       setError(message);
     } finally {
-      setLoadingServer(false);
       setLoading(false);
     }
   }, [txHash]);
