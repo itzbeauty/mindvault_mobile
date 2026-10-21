@@ -2,7 +2,6 @@ import Constants from "expo-constants";
 import { Buffer } from "buffer";
 import { Keypair, TransactionBuilder, contract, nativeToScVal, rpc } from "@stellar/stellar-sdk";
 import { getApiBaseUrl } from "./resources";
-import { getApiKey } from "../services/secureStorage";
 import { extractApiErrorMessage } from "../utils/errorLogger";
 
 /** Lease tier as stored on-chain (0=hour, 1=day, 2=week). */
