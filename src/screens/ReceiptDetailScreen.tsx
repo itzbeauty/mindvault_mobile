@@ -235,7 +235,6 @@ export function ReceiptDetailScreen({ route, navigation }: Props) {
   const [localReceipt, setLocalReceipt] = useState<PaymentReceipt | null>(null);
   const [serverReceipt, setServerReceipt] = useState<ServerReceipt | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingServer, setLoadingServer] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadLocalReceipt = useCallback(async () => {
@@ -248,7 +247,6 @@ export function ReceiptDetailScreen({ route, navigation }: Props) {
   }, [txHash]);
 
   const loadServerReceipt = useCallback(async () => {
-    setLoadingServer(true);
     try {
       const receipt = await fetchReceipt(txHash);
       setServerReceipt(receipt);
