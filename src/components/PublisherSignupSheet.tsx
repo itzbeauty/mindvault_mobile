@@ -16,7 +16,7 @@ import { useAppTheme } from "../theme/ThemeProvider";
 import type { ThemeColors } from "../theme";
 import { spacing } from "../theme";
 import { storeApiKey } from "../services/secureStorage";
-import { registerPublisher, type RegisterPublisherRequest } from "../api/publishers";
+import { registerPublisher } from "../api/publishers";
 
 interface PublisherSignupSheetProps {
   visible: boolean;
@@ -196,7 +196,7 @@ export function PublisherSignupSheet({
   onClose,
   onSuccess,
 }: PublisherSignupSheetProps) {
-  const { colors, shared, typography } = useAppTheme();
+  const { colors, typography } = useAppTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [phase, setPhase] = useState<"form" | "loading" | "success">("form");
