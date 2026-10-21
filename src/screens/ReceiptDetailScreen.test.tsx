@@ -4,7 +4,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { ReceiptDetailScreen } from "./ReceiptDetailScreen";
 import { getReceipt } from "../services/receipts";
 import { fetchReceipt } from "../api/payment";
-import { stellarExpertTxUrl } from "../utils/stellarExpert";
 
 jest.mock("../services/receipts", () => ({
   ...jest.requireActual("../services/receipts"),
@@ -67,15 +66,7 @@ jest.mock("../theme/ThemeProvider", () => {
   };
 });
 
-jest.mock("react-native", () => {
-  const RN = jest.requireActual("react-native");
-  return {
-    ...RN,
-    Alert: {
-      alert: jest.fn(),
-    },
-  };
-});
+
 
 const mockedGetReceipt = getReceipt as jest.MockedFunction<typeof getReceipt>;
 const mockedFetchReceipt = fetchReceipt as jest.MockedFunction<typeof fetchReceipt>;
@@ -135,7 +126,7 @@ describe("ReceiptDetailScreen", () => {
     mockedGetReceipt.mockResolvedValue(localReceipt);
     mockedFetchReceipt.mockResolvedValue(serverReceipt);
 
-    const { getByText, queryByText } = render(
+    const { getByText } = render(
       <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
