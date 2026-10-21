@@ -254,7 +254,6 @@ export function PaywallModal({
 
   function handleLeasePurchased(result: { tier: number; txHash: string }) {
     setShowLeaseSheet(false);
-    setToast?.(`Lease purchased! Tx: ${result.txHash}`);
     close();
   }
 
