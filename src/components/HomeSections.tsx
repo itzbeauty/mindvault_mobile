@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
@@ -111,7 +110,7 @@ function flattenResources(payload: unknown): Resource[] {
 }
 
 export function HomeSections({ excludeResourceId, onSeeAll }: HomeSectionsProps) {
-  const { colors, shared } = useAppTheme();
+  const { colors } = useAppTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [sections, setSections] = useState<SectionData[]>(
