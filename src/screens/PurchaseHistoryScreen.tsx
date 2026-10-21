@@ -33,9 +33,8 @@ export function formatUsdc(atomic: string): string {
 
 export function PurchaseHistoryScreen() {
   const { colors, shared, typography } = useAppTheme();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [receipts, setReceipts] = useState<Array<PaymentReceipt & { source: "local" | "on-chain" }>>([]);
+  const [receipts, setReceipts] = useState<(PaymentReceipt & { source: "local" | "on-chain" })[]>([]);
   const [nextOffset, setNextOffset] = useState<number | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
