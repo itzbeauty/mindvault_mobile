@@ -8,9 +8,6 @@ import {
   getStoredApiKey,
 } from "../api/resources";
 import type { Resource } from "../types";
-import { storeApiKey } from "../services/secureStorage";
-
-jest.mock("../services/secureStorage", () => ({ storeApiKey: jest.fn() }));
 
 jest.mock("../api/resources", () => ({
   fetchPublisherResources: jest.fn(),
@@ -398,9 +395,10 @@ describe("PublisherResourcesScreen - Publisher Signup", () => {
   });
 
   it("stores API key and loads resources on signup success", async () => {
+    const { storeApiKey } = require("../api/resources");
     const mockResources = [createResource({ id: "res-1", title: "My Resource" })];
     mockedFetchPublisherResources.mockResolvedValue(mockResources);
-    (storeApiKey as jest.Mock).mockResolvedValue(undefined);
+    storeApiKey.mockResolvedValue(undefined);
 
     const screen = render(<PublisherResourcesScreen />);
 
