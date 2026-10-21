@@ -252,7 +252,7 @@ export function PaywallModal({
     setShowLeaseSheet(true);
   }
 
-  function handleLeasePurchased(result: { tier: number; txHash: string }) {
+  function handleLeasePurchased() {
     setShowLeaseSheet(false);
     close();
   }
