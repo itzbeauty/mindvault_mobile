@@ -66,18 +66,6 @@ jest.mock("./ResourceCard", () => {
   };
 });
 
-jest.mock("react-native", () => {
-  const RN = jest.requireActual("react-native");
-  return {
-    ...RN,
-    FlatList: ({ data, renderItem, ...props }: any) => (
-      <RN.View {...props} testID="flatlist">
-        {data?.map((item: any, index: number) => renderItem({ item, index }))}
-      </RN.View>
-    ),
-  };
-});
-
 const mockedFetchCatalog = fetchCatalog as jest.MockedFunction<typeof fetchCatalog>;
 
 function createResource(overrides: Partial<Resource> = {}): Resource {
