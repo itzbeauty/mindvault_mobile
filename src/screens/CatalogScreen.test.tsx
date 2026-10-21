@@ -12,6 +12,7 @@ import {
 import { ThemeProvider } from "../theme/ThemeProvider";
 
 jest.mock("../api/resources");
+jest.mock("../components/HomeSections", () => ({ HomeSections: () => null }));
 jest.mock("../services/recent", () => ({
   getRecentResources: jest.fn(),
   recordRecentResource: jest.fn(),
