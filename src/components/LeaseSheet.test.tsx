@@ -270,5 +270,3 @@ describe("LeaseSheet", () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
-
-import { View, Text, Pressable } from "react-native";
