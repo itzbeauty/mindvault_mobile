@@ -336,9 +336,6 @@ export interface ServerReceipt {
 
 /** Fetches a receipt from the server for verification. */
 export async function fetchReceipt(paymentId: string): Promise<ServerReceipt> {
-  const { getApiBaseUrl } = await import("./resources");
-  const { extractApiErrorMessage } = await import("../utils/errorLogger");
-
   const res = await fetch(`${getApiBaseUrl()}/payments/${encodeURIComponent(paymentId)}/receipt`);
 
   if (!res.ok) {
