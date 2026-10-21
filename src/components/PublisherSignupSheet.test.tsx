@@ -10,7 +10,10 @@ jest.mock("../api/publishers", () => ({
   registerPublisher: jest.fn(),
 }));
 
-jest.mock("react-native/Libraries/Alert/Alert", () => ({ alert: jest.fn() }));
+jest.mock("react-native/Libraries/Alert/Alert", () => ({
+  __esModule: true,
+  default: { alert: jest.fn() },
+}));
 
 jest.mock("../services/secureStorage", () => ({
   ...jest.requireActual("../services/secureStorage"),
