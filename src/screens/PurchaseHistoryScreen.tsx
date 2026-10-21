@@ -206,7 +206,7 @@ export function PurchaseHistoryScreen() {
         renderItem={({ item }) => <ReceiptRow receipt={item} />}
         onEndReached={() => void loadMore()}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loadingMore ? <ActivityIndicator color={colors.primary} accessibilityLabel="Loading more purchases" /> : null}}
+        ListFooterComponent={loadingMore ? <ActivityIndicator color={colors.primary} accessibilityLabel="Loading more purchases" /> : null}
       />
 
       <Modal
