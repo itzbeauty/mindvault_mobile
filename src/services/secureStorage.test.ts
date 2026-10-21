@@ -114,3 +114,52 @@ describe("storeApiKey", () => {
     expect(store.setItemAsync).toHaveBeenCalledWith("x-api-key", "abc");
   });
 });
+
+
+describe("secure storage failure handling", () => {
+  it("uses a fixed error when saving the API key fails", async () => {
+    store.setItemAsync.mockRejectedValue(new Error("secret-key native failure"));
+    await expect(storeApiKey("secret-key")).rejects.toThrow(SecureStorageError);
+    await expect(storeApiKey("secret-key")).rejects.not.toThrow("secret-key");
+  });
+
+  it("uses a fixed error when reading the biometric preference fails", async () => {
+    store.getItemAsync.mockRejectedValue(new Error("secret-key native failure"));
+    await expect(isBiometricLockEnabled()).rejects.toThrow(SecureStorageError);
+    await expect(isBiometricLockEnabled()).rejects.not.toThrow("secret-key");
+  });
+
+  it("uses a fixed error when writing the biometric preference fails", async () => {
+    auth.hasHardwareAsync.mockResolvedValue(true);
+    auth.isEnrolledAsync.mockResolvedValue(true);
+    store.setItemAsync.mockRejectedValue(new Error("secret-key native failure"));
+    await expect(setBiometricLockEnabled(true)).rejects.toThrow(SecureStorageError);
+  });
+
+  it("uses a fixed error when deleting the biometric preference fails", async () => {
+    store.deleteItemAsync.mockRejectedValue(new Error("secret-key native failure"));
+    await expect(setBiometricLockEnabled(false)).rejects.toThrow(SecureStorageError);
+  });
+
+  it("uses a fixed error when deleting the API key fails", async () => {
+    store.deleteItemAsync.mockRejectedValue(new Error("secret-key native failure"));
+    const { clearApiKey } = await import("./secureStorage");
+    await expect(clearApiKey()).rejects.toThrow(SecureStorageError);
+    await expect(clearApiKey()).rejects.not.toThrow("secret-key");
+  });
+
+  it("uses a fixed error when reading the API key fails", async () => {
+    store.getItemAsync.mockImplementation(async (key) => {
+      if (key === "biometric-lock-enabled") return null;
+      throw new Error("secret-key native failure");
+    });
+    await expect(getApiKey()).rejects.toThrow(SecureStorageError);
+    await expect(getApiKey()).rejects.not.toThrow("secret-key");
+  });
+
+  it("does not leak a secret when biometric authentication fails", async () => {
+    mockStore(true, "secret-key");
+    auth.authenticateAsync.mockRejectedValue(new Error("secret-key"));
+    await expect(getApiKey()).rejects.not.toThrow("secret-key");
+  });
+});
