@@ -102,7 +102,7 @@ describe("ReceiptDetailScreen", () => {
     });
 
     const { getByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     expect(getByText("Loading receipt details…")).toBeTruthy();
@@ -136,7 +136,7 @@ describe("ReceiptDetailScreen", () => {
     mockedFetchReceipt.mockResolvedValue(serverReceipt);
 
     const { getByText, queryByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     await waitFor(() => {
@@ -173,7 +173,7 @@ describe("ReceiptDetailScreen", () => {
     mockedFetchReceipt.mockResolvedValue(serverReceipt);
 
     const { getByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     await waitFor(() => {
@@ -200,7 +200,7 @@ describe("ReceiptDetailScreen", () => {
     mockedFetchReceipt.mockResolvedValue(serverReceipt);
 
     const { getByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     await waitFor(() => {
@@ -214,7 +214,7 @@ describe("ReceiptDetailScreen", () => {
     mockedFetchReceipt.mockRejectedValue(new Error("Network error"));
 
     const { getByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     await waitFor(() => {
@@ -240,7 +240,7 @@ describe("ReceiptDetailScreen", () => {
     mockedFetchReceipt.mockResolvedValue(serverReceipt);
 
     const { getByText } = render(
-      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } }} navigation={{ navigate: jest.fn() }} />
+      <ReceiptDetailScreen route={{ params: { txHash: "abc123def456" } } as any} navigation={{ navigate: jest.fn() } as any} />
     );
 
     await waitFor(() => {
