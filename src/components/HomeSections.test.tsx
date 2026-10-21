@@ -225,5 +225,3 @@ describe("HomeSections", () => {
     });
   });
 });
-
-import { View, Text } from "react-native";
