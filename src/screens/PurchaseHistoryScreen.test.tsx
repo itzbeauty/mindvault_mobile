@@ -20,6 +20,7 @@ jest.mock("react-native-safe-area-context", () => require("../test-utils").safeA
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useFocusEffect: (effect: () => void) => require("react").useEffect(effect, [effect]),
+  useNavigation: () => ({ navigate: jest.fn() }),
 }));
 
 const mockedListReceipts = listReceipts as jest.MockedFunction<typeof listReceipts>;
