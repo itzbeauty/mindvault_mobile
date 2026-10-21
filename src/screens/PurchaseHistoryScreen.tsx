@@ -203,7 +203,7 @@ export function PurchaseHistoryScreen() {
             </Text>
           </View>
         }
-        renderItem={({ item }) => <ReceiptRow receipt={item} />
+        renderItem={({ item }) => <ReceiptRow receipt={item} />}
         onEndReached={() => void loadMore()}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loadingMore ? <ActivityIndicator color={colors.primary} accessibilityLabel="Loading more purchases" /> : null}}
