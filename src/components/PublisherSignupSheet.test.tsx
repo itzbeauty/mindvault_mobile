@@ -1,6 +1,5 @@
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Alert } from "react-native";
 
 import { PublisherSignupSheet } from "./PublisherSignupSheet";
 import { registerPublisher } from "../api/publishers";
