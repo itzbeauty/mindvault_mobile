@@ -1,7 +1,10 @@
 import * as SecureStore from "expo-secure-store";
+import { Keypair, Networks, TransactionBuilder, Operation, Asset, Account } from "@stellar/stellar-sdk";
 
 
 import { generateWallet, getPublicKey, importWallet, sign, wipe } from "./wallet";
+
+jest.unmock("@stellar/stellar-sdk");
 
 jest.mock("expo-secure-store", () => ({
   getItemAsync: jest.fn(),
