@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 import { Buffer } from "buffer";
+import { Keypair, TransactionBuilder, contract, nativeToScVal, rpc } from "@stellar/stellar-sdk";
 import { getApiBaseUrl } from "./resources";
 import { getApiKey } from "../services/secureStorage";
 import { extractApiErrorMessage } from "../utils/errorLogger";
@@ -36,7 +37,6 @@ export interface LeasePurchaseResult {
 
 /** Creates a Soroban contract client for the vault registry. */
 export async function getRegistryClient() {
-  const { contract } = await import("@stellar/stellar-sdk");
   const registryContractId =
     (Constants.expoConfig?.extra?.registryContractId as string | undefined)?.trim() ??
     "CDQKUIADLO5S5WEHEUTTXX2M45WAHVRU2PBEBD6ZGDKMOP5A72FJ3OD4";
@@ -47,11 +47,7 @@ export async function getRegistryClient() {
     (Constants.expoConfig?.extra?.networkPassphrase as string | undefined) ??
     "Test SDF Network ; September 2015";
 
-  return new contract.Client({
-    contractId: registryContractId,
-    networkPassphrase,
-    rpcUrl,
-  });
+  return { contractId: registryContractId, networkPassphrase, rpcUrl };
 }
 
 /** Fetches a lease quote from the API. */
@@ -82,8 +78,6 @@ export async function buyLease(
   const creator = quote.creator;
 
   // Step 2: Build and sign USDC transfer
-  const { Keypair, contract, nativeToScVal, rpc } = await import("@stellar/stellar-sdk");
-
   const keypair = Keypair.fromSecret(secretKey.trim());
   const payer = keypair.publicKey();
 
@@ -141,10 +135,10 @@ export async function buyLease(
 
   // Submit the USDC transfer to get the transaction hash
   const server = new rpc.Server(rpcUrl);
-  const submitResponse = await server.sendTransaction(signedTransferXdr);
+  const submitResponse = await server.sendTransaction(TransactionBuilder.fromXDR(signedTransferXdr, networkPassphrase));
 
   if (submitResponse.status !== "PENDING") {
-    throw new Error(`USDC transfer failed: ${submitResponse.errorResultXdr ?? "unknown"}`);
+    throw new Error(`USDC transfer failed: ${submitResponse.errorResult ?? "unknown"}`);
   }
 
   const txHash = submitResponse.hash;
@@ -153,12 +147,19 @@ export async function buyLease(
   const registry = await getRegistryClient();
   const holder = payer;
 
-  const buyLeaseAssembled = await registry.buy_lease({
-    holder: nativeToScVal(holder, { type: "address" }),
-    resource_id: nativeToScVal(resourceId, { type: "string" }),
-    tier: nativeToScVal(tier, { type: "u32" }),
-    amount: nativeToScVal(BigInt(amount), { type: "i128" }),
-    tx_hash: nativeToScVal(Buffer.from(txHash, "hex"), { type: "bytes" }),
+  const buyLeaseAssembled = await contract.AssembledTransaction.build({
+    contractId: registry.contractId,
+    method: "buy_lease",
+    args: [
+      nativeToScVal(holder, { type: "address" }),
+      nativeToScVal(resourceId, { type: "string" }),
+      nativeToScVal(tier, { type: "u32" }),
+      nativeToScVal(BigInt(amount), { type: "i128" }),
+      nativeToScVal(Buffer.from(txHash, "hex"), { type: "bytes" }),
+    ],
+    networkPassphrase: registry.networkPassphrase,
+    rpcUrl: registry.rpcUrl,
+    parseResultXdr: (result) => result,
   });
 
   // Verify buy_lease simulation
@@ -189,10 +190,10 @@ export async function buyLease(
   const signedBuyLeaseXdr = await signTransaction(buyLeaseUnsignedXdr, networkPassphrase);
 
   // Submit the buy_lease transaction
-  const buyLeaseResponse = await server.sendTransaction(signedBuyLeaseXdr);
+  const buyLeaseResponse = await server.sendTransaction(TransactionBuilder.fromXDR(signedBuyLeaseXdr, networkPassphrase));
 
   if (buyLeaseResponse.status !== "PENDING") {
-    throw new Error(`buy_lease failed: ${buyLeaseResponse.errorResultXdr ?? "unknown"}`);
+    throw new Error(`buy_lease failed: ${buyLeaseResponse.errorResult ?? "unknown"}`);
   }
 
   // Return the result with the buy_lease transaction hash
