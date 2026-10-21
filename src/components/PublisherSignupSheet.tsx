@@ -334,7 +334,7 @@ export function PublisherSignupSheet({
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
-                  editable={phase !== "loading"}
+                  editable
                   accessibilityLabel="Email address"
                 />
                 {touched.email && errors.email && (
@@ -355,7 +355,7 @@ export function PublisherSignupSheet({
                   style={[styles.input, errors.walletAddress && styles.inputError]}
                   autoCapitalize="characters"
                   autoCorrect={false}
-                  editable={phase !== "loading"}
+                  editable
                   accessibilityLabel="Stellar wallet address"
                 />
                 {touched.walletAddress && errors.walletAddress && (
