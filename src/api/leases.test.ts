@@ -1,11 +1,4 @@
-import { quoteLease, buyLease, leaseTierLabel, leaseTierSeconds, type LeaseTier, type LeaseQuote } from "./leases";
-import { getApiKey } from "../services/secureStorage";
-
-jest.mock("../services/secureStorage", () => ({
-  getApiKey: jest.fn(),
-}));
-
-const mockGetApiKey = getApiKey as jest.MockedFunction<typeof getApiKey>;
+import { quoteLease, leaseTierLabel, leaseTierSeconds, type LeaseQuote } from "./leases";
 
 describe("quoteLease", () => {
   const originalFetch = global.fetch;
