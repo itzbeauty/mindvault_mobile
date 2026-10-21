@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -249,7 +249,7 @@ export function LeaseSheet({
 
   async function handleConfirm() {
     if (!selectedTier || !quote || busy.current) return;
-    const run = ++flow.current;
+    flow.current += 1;
     busy.current = true;
     setErrorMsg(null);
     setPhase("signing");
