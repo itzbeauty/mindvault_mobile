@@ -262,5 +262,3 @@ describe("PublisherSignupSheet", () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
-
-import { Alert } from "react-native";
