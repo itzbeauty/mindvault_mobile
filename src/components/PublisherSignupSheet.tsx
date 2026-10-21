@@ -381,7 +381,7 @@ export function PublisherSignupSheet({
 
               <Pressable
                 onPress={onClose}
-                disabled={phase === "loading"}
+                disabled={false}
                 style={styles.cancelButton}
                 accessibilityRole="button"
                 accessibilityLabel="Cancel"
