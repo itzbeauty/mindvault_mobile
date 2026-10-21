@@ -501,7 +501,7 @@ export function ReceiptDetailScreen({ route, navigation }: Props) {
               <Text style={styles.sectionTitle}>Local Receipt</Text>
             </View>
             <View style={styles.sectionContent}>
-              <Text style={styles.summaryText} textAlign="center">
+              <Text style={[styles.summaryText, { textAlign: "center" }]}>
                 No local receipt found for this transaction.
               </Text>
             </View>
