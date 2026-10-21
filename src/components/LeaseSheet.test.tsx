@@ -11,18 +11,21 @@ jest.mock("../api/leases", () => ({
   buyLease: jest.fn(),
 }));
 
-jest.mock("../components/SignTransactionSheet", () => ({
-  SignTransactionSheet: ({ visible, onCancel, onSigned, children }: any) => {
-    if (!visible) return null;
-    return (
-      <View testID="sign-transaction-sheet">
-        <Text testID="sign-sheet-title">Sign Transaction Sheet</Text>
-        <Pressable testID="mock-sign-btn" onPress={() => onSigned("SIGNED_XDR")} />
-        <Pressable testID="mock-sign-cancel" onPress={onCancel} />
-      </View>
-    );
-  },
-}));
+jest.mock("../components/SignTransactionSheet", () => {
+  const RN = jest.requireActual("react-native");
+  return {
+    SignTransactionSheet: ({ visible, onCancel, onSigned }: any) => {
+      if (!visible) return null;
+      return (
+        <RN.View testID="sign-transaction-sheet">
+          <RN.Text testID="sign-sheet-title">Sign Transaction Sheet</RN.Text>
+          <RN.Pressable testID="mock-sign-btn" onPress={() => onSigned("SIGNED_XDR")} />
+          <RN.Pressable testID="mock-sign-cancel" onPress={onCancel} />
+        </RN.View>
+      );
+    },
+  };
+});
 
 jest.mock("../theme/ThemeProvider", () => {
   const colors = {
