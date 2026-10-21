@@ -60,17 +60,7 @@ jest.mock("../theme/ThemeProvider", () => {
   };
 });
 
-jest.mock("react-native", () => {
-  const RN = jest.requireActual("react-native");
-  return {
-    ...RN,
-    Alert: {
-      alert: jest.fn((title, message, buttons) => {
-        if (buttons?.[0]?.onPress) buttons[0].onPress();
-      }),
-    },
-  };
-});
+
 
 const mockedRegisterPublisher = registerPublisher as jest.MockedFunction<typeof registerPublisher>;
 const mockedStoreApiKey = storeApiKey as jest.MockedFunction<typeof storeApiKey>;
@@ -78,6 +68,7 @@ const mockedStoreApiKey = storeApiKey as jest.MockedFunction<typeof storeApiKey>
 describe("PublisherSignupSheet", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
   });
 
   it("renders form fields when visible", () => {
