@@ -1,5 +1,7 @@
 import { stellarExpertAccountUrl, stellarExpertTxUrl } from "./stellarExpert";
 
+import { stellarExpertAccountUrl, stellarExpertTxUrl } from "./stellarExpert";
+
 jest.mock("expo-constants", () => ({
   __esModule: true,
   default: {
