@@ -1,6 +1,6 @@
-jest.mock("./resources", () => ({ getApiBaseUrl: () => "https://api.example.test" }));
-
 import { fetchBuyerPayments } from "./payments";
+
+jest.mock("./resources", () => ({ getApiBaseUrl: () => "https://api.example.test" }));
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch as typeof fetch;
