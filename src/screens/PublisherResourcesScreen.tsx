@@ -412,14 +412,19 @@ export function PublisherResourcesScreen() {
     }
   };
 
-  const handleSignupSuccess = useCallback((newApiKey: string) => {
-    setStoredApiKey(newApiKey);
-    setAuthenticated(true);
-    setShowSignup(false);
-    // Load resources with the new key
-    void loadResources(newApiKey).then((loaded) => {
+  const handleSignupSuccess = useCallback(async (newApiKey: string) => {
+    const normalizedKey = newApiKey.trim();
+    try {
+      await storeApiKey(normalizedKey);
+      setStoredApiKey(normalizedKey);
+      setAuthenticated(true);
+      setShowSignup(false);
+      const loaded = await loadResources(normalizedKey);
       if (loaded) setToast("Publisher account created successfully");
-    });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save publisher API key";
+      setError(message);
+    }
   }, [loadResources]);
 
   const handleRefresh = async () => {
