@@ -11,6 +11,8 @@ jest.mock("../api/publishers", () => ({
   registerPublisher: jest.fn(),
 }));
 
+jest.mock("react-native/Libraries/Alert/Alert", () => ({ alert: jest.fn() }));
+
 jest.mock("../services/secureStorage", () => ({
   ...jest.requireActual("../services/secureStorage"),
   storeApiKey: jest.fn(),
@@ -69,7 +71,6 @@ const mockedStoreApiKey = storeApiKey as jest.MockedFunction<typeof storeApiKey>
 describe("PublisherSignupSheet", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
   });
 
   it("renders form fields when visible", () => {
