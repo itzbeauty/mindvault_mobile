@@ -245,5 +245,3 @@ describe("ReceiptDetailScreen", () => {
     });
   });
 });
-
-import { Alert } from "react-native";
