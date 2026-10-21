@@ -1,3 +1,5 @@
+import { stellarExpertAccountUrl, stellarExpertTxUrl } from "./stellarExpert";
+
 jest.mock("expo-constants", () => ({
   __esModule: true,
   default: {
@@ -9,8 +11,6 @@ jest.mock("expo-constants", () => ({
     },
   },
 }));
-
-import { stellarExpertAccountUrl, stellarExpertTxUrl } from "./stellarExpert";
 
 describe("stellarExpert URL helpers", () => {
   it("uses the configured explorer network when no explicit network is provided", () => {
