@@ -209,7 +209,7 @@ export function HomeSections({ excludeResourceId, onSeeAll }: HomeSectionsProps)
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>{config.title}</Text>
               <Pressable
-                onPress={() => onSeeAll?.(config.sort, config.params.verificationStatus ? { verificationStatus: config.params.verificationStatus } : undefined)}
+                onPress={() => onSeeAll?.(config.sort, "verificationStatus" in config.params && config.params.verificationStatus ? { verificationStatus: config.params.verificationStatus } : undefined)}
                 style={styles.seeAllButton}
                 accessibilityRole="button"
                 accessibilityLabel={`See all ${config.title.toLowerCase()} resources`}
