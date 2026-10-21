@@ -23,7 +23,7 @@ const challenge: PaymentChallenge = {
   x402Version: 2, resource: { url: "https://api.example.com/resources/book", description: "Handbook" },
   accepted: { scheme: "exact", network: "stellar:testnet", amount: "12500000", asset: "C-USDC", payTo: "G-payee", maxTimeoutSeconds: 60, extra: { areFeesSponsored: true } },
 };
-const props = { visible: true, accessUrl: "https://api.example.com/resources/book", resourceTitle: "Handbook", price: "1.25", onClose: jest.fn() };
+const props = { visible: true, accessUrl: "https://api.example.com/resources/book", resourceTitle: "Handbook", price: "1.25", resourceId: "res-1", onClose: jest.fn() };
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
