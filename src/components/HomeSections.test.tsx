@@ -55,22 +55,25 @@ jest.mock("../theme/ThemeProvider", () => {
   };
 });
 
-jest.mock("./ResourceCard", () => ({
-  ResourceCard: ({ resource }: { resource: Resource }) => (
-    <View testID={`resource-card-${resource.id}`} accessible accessibilityLabel={resource.title}>
-      <Text>{resource.title}</Text>
-    </View>
-  ),
-}));
+jest.mock("./ResourceCard", () => {
+  const { View: MockView, Text: MockText } = jest.requireActual("react-native");
+  return {
+    ResourceCard: ({ resource }: { resource: Resource }) => (
+      <MockView testID={`resource-card-${resource.id}`} accessible accessibilityLabel={resource.title}>
+        <MockText>{resource.title}</MockText>
+      </MockView>
+    ),
+  };
+});
 
 jest.mock("react-native", () => {
   const RN = jest.requireActual("react-native");
   return {
     ...RN,
     FlatList: ({ data, renderItem, ...props }: any) => (
-      <View {...props} testID="flatlist">
+      <RN.View {...props} testID="flatlist">
         {data?.map((item: any, index: number) => renderItem({ item, index }))}
-      </View>
+      </RN.View>
     ),
   };
 });
