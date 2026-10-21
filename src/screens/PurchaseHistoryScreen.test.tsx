@@ -9,6 +9,8 @@ jest.mock("../services/receipts", () => ({
   listReceipts: jest.fn(),
   clearReceipts: jest.fn(),
 }));
+jest.mock("../services/wallet", () => ({ getPublicKey: jest.fn().mockResolvedValue(null) }));
+jest.mock("../api/payments", () => ({ fetchBuyerPayments: jest.fn() }));
 jest.mock("../utils/stellarExpert", () => ({
   ...jest.requireActual("../utils/stellarExpert"),
   openExternalUrl: jest.fn().mockResolvedValue(undefined),
@@ -130,4 +132,53 @@ it("shows the storage error instead of an empty list", async () => {
   const screen = renderWithProviders(<PurchaseHistoryScreen />);
 
   expect(await screen.findByText("The receipt store was created by a newer app version.")).toBeTruthy();
+});
+
+const mockedGetPublicKey = require("../services/wallet").getPublicKey as jest.Mock;
+const mockedFetchBuyerPayments = require("../api/payments").fetchBuyerPayments as jest.Mock;
+
+it("merges on-chain payments with local receipts and de-duplicates by transaction hash", async () => {
+  mockedListReceipts.mockResolvedValue(receipts);
+  mockedGetPublicKey.mockResolvedValue("Gbuyer");
+  mockedFetchBuyerPayments.mockResolvedValue({
+    payments: [
+      {
+        txHash: "tx-newest",
+        resourceId: "res-1",
+        resourceTitle: "Duplicate title",
+        amount: "12500000",
+        asset: "CASSET",
+        network: "stellar:testnet",
+        payer: "GPAYER",
+        paidAt: "2026-10-10T09:00:00.000Z",
+      },
+      {
+        txHash: "tx-chain",
+        resourceId: "res-3",
+        resourceTitle: "On-chain purchase",
+        amount: "2000000",
+        asset: "CASSET",
+        network: "stellar:testnet",
+        payer: "Gbuyer",
+        paidAt: "2026-10-11T09:00:00.000Z",
+      },
+    ],
+    nextOffset: 20,
+  });
+
+  const screen = renderWithProviders(<PurchaseHistoryScreen />);
+  expect(await screen.findByText("On-chain purchase")).toBeTruthy();
+  expect(screen.getAllByText("Saved on this device")).toHaveLength(2);
+  expect(screen.getByText("On-chain payment")).toBeTruthy();
+  expect(screen.getAllByLabelText("View transaction tx-newest on Stellar Expert")).toHaveLength(1);
+  expect(mockedFetchBuyerPayments).toHaveBeenCalledWith("Gbuyer", { limit: 20, offset: 0 });
+});
+
+it("keeps local history available without a wallet", async () => {
+  mockedListReceipts.mockResolvedValue(receipts);
+  mockedGetPublicKey.mockResolvedValue(null);
+  const screen = renderWithProviders(<PurchaseHistoryScreen />);
+  expect(await screen.findByText("Stellar handbook")).toBeTruthy();
+  expect(mockedFetchBuyerPayments).not.toHaveBeenCalled();
+  expect(screen.queryByText("On-chain payment")).toBeNull();
 });

@@ -16,6 +16,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ReceiptExportButton } from "../components/ReceiptExportButton";
 import { clearReceipts, listReceipts, type PaymentReceipt } from "../services/receipts";
+import { fetchBuyerPayments } from "../api/payments";
+import { getPublicKey } from "../services/wallet";
 import { spacing, type ThemeColors } from "../theme";
 import { useAppTheme } from "../theme/ThemeProvider";
 import { openExternalUrl, stellarExpertTxUrl } from "../utils/stellarExpert";
@@ -33,7 +35,9 @@ export function PurchaseHistoryScreen() {
   const { colors, shared, typography } = useAppTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [receipts, setReceipts] = useState<PaymentReceipt[]>([]);
+  const [receipts, setReceipts] = useState<Array<PaymentReceipt & { source: "local" | "on-chain" }>>([]);
+  const [nextOffset, setNextOffset] = useState<number | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -41,14 +45,80 @@ export function PurchaseHistoryScreen() {
 
   const loadReceipts = useCallback(async () => {
     try {
-      setReceipts(await listReceipts());
+      const local = await listReceipts();
+      const localEntries = local.map((receipt) => ({ ...receipt, source: "local" as const }));
+      setReceipts(localEntries);
+      setNextOffset(null);
       setError(null);
+
+      const address = await getPublicKey();
+      if (address) {
+        try {
+          const page = await fetchBuyerPayments(address, { limit: 20, offset: 0 });
+          const seenHashes = new Set(local.map((receipt) => receipt.txHash));
+          const chainEntries = page.payments
+            .filter((payment) => {
+              if (seenHashes.has(payment.txHash)) return false;
+              seenHashes.add(payment.txHash);
+              return true;
+            })
+            .map((payment) => ({
+              resourceId: payment.resourceId,
+              title: payment.resourceTitle,
+              amount: payment.amount,
+              asset: payment.asset,
+              network: payment.network,
+              txHash: payment.txHash,
+              payer: payment.payer,
+              paidAt: payment.paidAt,
+              source: "on-chain" as const,
+            }));
+          setReceipts([...localEntries, ...chainEntries].sort(
+            (a, b) => Date.parse(b.paidAt) - Date.parse(a.paidAt)
+          ));
+          setNextOffset(page.nextOffset);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Unable to load on-chain purchase history.");
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load purchase history.");
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || nextOffset === null) return;
+    setLoadingMore(true);
+    try {
+      const address = await getPublicKey();
+      if (!address) { setNextOffset(null); return; }
+      const page = await fetchBuyerPayments(address, { limit: 20, offset: nextOffset });
+      setReceipts((current) => {
+        const known = new Set(current.map((receipt) => receipt.txHash));
+        const additions = page.payments
+          .filter((payment) => !known.has(payment.txHash))
+          .map((payment) => ({
+            resourceId: payment.resourceId,
+            title: payment.resourceTitle,
+            amount: payment.amount,
+            asset: payment.asset,
+            network: payment.network,
+            txHash: payment.txHash,
+            payer: payment.payer,
+            paidAt: payment.paidAt,
+            source: "on-chain" as const,
+          }));
+        return [...current, ...additions].sort((a, b) => Date.parse(b.paidAt) - Date.parse(a.paidAt));
+      });
+      setNextOffset(page.nextOffset);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load more purchases.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, nextOffset]);
 
   // Reload on focus, so a purchase made elsewhere in the app shows up straight away.
   useFocusEffect(
@@ -133,7 +203,10 @@ export function PurchaseHistoryScreen() {
             </Text>
           </View>
         }
-        renderItem={({ item }) => <ReceiptRow receipt={item} />}
+        renderItem={({ item }) => <ReceiptRow receipt={item} />
+        onEndReached={() => void loadMore()}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={loadingMore ? <ActivityIndicator color={colors.primary} accessibilityLabel="Loading more purchases" /> : null}}
       />
 
       <Modal
@@ -173,7 +246,7 @@ export function PurchaseHistoryScreen() {
   );
 }
 
-function ReceiptRow({ receipt }: { receipt: PaymentReceipt }) {
+function ReceiptRow({ receipt }: { receipt: PaymentReceipt & { source: "local" | "on-chain" } }) {
   const { colors, typography } = useAppTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const title = receipt.title.trim() || "Untitled resource";
@@ -195,6 +268,7 @@ function ReceiptRow({ receipt }: { receipt: PaymentReceipt }) {
     <Pressable onPress={handlePress} style={[rowStyles.row, { borderColor: colors.border }]}>
       <Text style={typography.cardTitle}>{title}</Text>
       <Text style={typography.price}>{formatUsdc(receipt.amount)}</Text>
+      <Text style={typography.body}>{receipt.source === "local" ? "Saved on this device" : "On-chain payment"}</Text>
       <Text style={typography.body}>{paidOn}</Text>
       <Pressable
         onPress={(e) => {
