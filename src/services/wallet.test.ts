@@ -1,7 +1,5 @@
 import * as SecureStore from "expo-secure-store";
-jest.unmock("@stellar/stellar-sdk");
 
-import { Keypair, Networks, TransactionBuilder, Operation, Asset, Account } from "@stellar/stellar-sdk";
 
 import { generateWallet, getPublicKey, importWallet, sign, wipe } from "./wallet";
 
