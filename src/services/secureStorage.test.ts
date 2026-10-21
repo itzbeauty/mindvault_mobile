@@ -2,6 +2,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
 
 import {
+  clearApiKey,
   getApiKey,
   isBiometricAvailable,
   isBiometricLockEnabled,
@@ -143,7 +144,6 @@ describe("secure storage failure handling", () => {
 
   it("uses a fixed error when deleting the API key fails", async () => {
     store.deleteItemAsync.mockRejectedValue(new Error("secret-key native failure"));
-    const { clearApiKey } = await import("./secureStorage");
     await expect(clearApiKey()).rejects.toThrow(SecureStorageError);
     await expect(clearApiKey()).rejects.not.toThrow("secret-key");
   });
