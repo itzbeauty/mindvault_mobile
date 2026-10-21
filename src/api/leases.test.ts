@@ -1,4 +1,4 @@
-import { quoteLease, buyLease, leaseTierLabel, type LeaseTier, type LeaseQuote } from "./leases";
+import { quoteLease, buyLease, leaseTierLabel, leaseTierSeconds, type LeaseTier, type LeaseQuote } from "./leases";
 import { getApiKey } from "../services/secureStorage";
 
 jest.mock("../services/secureStorage", () => ({
