@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { PublisherSignupSheet } from "./PublisherSignupSheet";
@@ -12,6 +13,7 @@ jest.mock("../api/publishers", () => ({
 
 jest.mock("react-native/Libraries/Alert/Alert", () => ({
   __esModule: true,
+  alert: jest.fn(),
   default: { alert: jest.fn() },
 }));
 
@@ -135,7 +137,7 @@ describe("PublisherSignupSheet", () => {
     fireEvent.press(getByText("Create Account"));
 
     await waitFor(() => {
-      expect(getByText("Enter a valid Stellar public key")).toBeTruthy();
+      expect(getByText(/Enter a valid Stellar public key/)).toBeTruthy();
     });
   });
 

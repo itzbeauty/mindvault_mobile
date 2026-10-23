@@ -274,7 +274,7 @@ export function PublisherSignupSheet({
     } catch (err) {
       setPhase("form");
       const message = err instanceof Error ? err.message : "Registration failed. Please try again.";
-      Alert.alert("Registration Failed", message);
+      Alert.alert("Registration Failed", message, [{ text: "OK" }]);
     }
   };
 

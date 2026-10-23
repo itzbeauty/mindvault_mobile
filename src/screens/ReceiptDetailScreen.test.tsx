@@ -17,7 +17,7 @@ jest.mock("../api/payment", () => ({
 
 jest.mock("../utils/stellarExpert", () => ({
   ...jest.requireActual("../utils/stellarExpert"),
-  stellarExpertTxUrl: jest.fn(() => "https://stellar.expert/explorer/testnet/tx/abc123"),
+  stellarExpertTxUrl: jest.fn((args: any) => `https://stellar.expert/explorer/${args.network}/tx/${args.txHash}`),
   openExternalUrl: jest.fn(),
 }));
 
@@ -195,7 +195,7 @@ describe("ReceiptDetailScreen", () => {
     );
 
     await waitFor(() => {
-      expect(getByText("No local receipt to compare")).toBeTruthy();
+      expect(getByText(/No local receipt to compare/)).toBeTruthy();
       expect(getByText("No local receipt found for this transaction.")).toBeTruthy();
     });
   });

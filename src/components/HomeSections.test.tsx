@@ -148,11 +148,12 @@ describe("HomeSections", () => {
 
   it("hides section when it fails to load", async () => {
     const newestResources = [createResource({ id: "new-1", title: "Newest Resource" })];
+    const verifiedResources = [createResource({ id: "ver-1", title: "Verified Resource" })];
 
     mockedFetchCatalog
       .mockResolvedValueOnce({ items: newestResources, total: 1, nextOffset: null })
       .mockRejectedValueOnce(new Error("Network error"))
-      .mockResolvedValueOnce({ items: [], total: 0, nextOffset: null });
+      .mockResolvedValueOnce({ items: verifiedResources, total: 1, nextOffset: null });
 
     const { getByText, queryByText } = render(<HomeSections />);
 
@@ -189,23 +190,26 @@ describe("HomeSections", () => {
       .mockResolvedValueOnce({ items: cheapestResources, total: 1, nextOffset: null })
       .mockResolvedValueOnce({ items: verifiedResources, total: 1, nextOffset: null });
 
-    const { getByText } = render(<HomeSections onSeeAll={onSeeAll} />);
+    const { getByLabelText } = render(<HomeSections onSeeAll={onSeeAll} />);
 
     await waitFor(() => {
-      expect(getByText("Newest Resource")).toBeTruthy();
+      expect(getByLabelText("See all newest resources")).toBeTruthy();
     });
 
-    fireEvent.press(getByText("See all"));
+    fireEvent.press(getByLabelText("See all newest resources"));
 
     await waitFor(() => {
       expect(onSeeAll).toHaveBeenCalledWith("newest", undefined);
     });
 
-    // Reset mock for next section
+    // The verified section carries its filter through to the callback.
     onSeeAll.mockClear();
 
-    // Find the "See all" for Cheapest - need to query by accessibility label
-    // Since we can't easily find it, let's just verify the first one works
+    fireEvent.press(getByLabelText("See all verified resources"));
+
+    await waitFor(() => {
+      expect(onSeeAll).toHaveBeenCalledWith(undefined, { verificationStatus: "verified" });
+    });
   });
 
   it("excludes the specified resourceId from sections", async () => {

@@ -12,7 +12,31 @@ import {
 import { ThemeProvider } from "../theme/ThemeProvider";
 
 jest.mock("../api/resources");
-jest.mock("../components/HomeSections", () => ({ HomeSections: () => null }));
+jest.mock("../components/HomeSections", () => {
+  const RN = jest.requireActual("react-native");
+  const sections = [
+    { title: "Newest", sort: "newest" },
+    { title: "Cheapest", sort: "price_asc" },
+    { title: "Verified", sort: undefined },
+  ];
+  return {
+    HomeSections: ({ onSeeAll }: any) => (
+      <RN.View>
+        {sections.map((section) => (
+          <RN.View key={section.title}>
+            <RN.Text>{`Home section: ${section.title}`}</RN.Text>
+            <RN.Pressable
+              accessibilityLabel={`See all ${section.title.toLowerCase()} resources`}
+              onPress={() => onSeeAll?.(section.sort)}
+            >
+              <RN.Text>{`See all ${section.title}`}</RN.Text>
+            </RN.Pressable>
+          </RN.View>
+        ))}
+      </RN.View>
+    ),
+  };
+});
 jest.mock("../services/recent", () => ({
   getRecentResources: jest.fn(),
   recordRecentResource: jest.fn(),
@@ -491,20 +515,10 @@ describe("CatalogScreen recently viewed", () => {
 
 describe("CatalogScreen HomeSections", () => {
   it("renders HomeSections when no filters are active", async () => {
-    const resources = [
-      makeResource("new-1", "Newest Resource"),
-      makeResource("cheap-1", "Cheapest Resource"),
-      makeResource("ver-1", "Verified Resource"),
-    ];
-    mockedFetchCatalog
-      .mockResolvedValueOnce({ items: resources.slice(0, 1), total: 10, nextOffset: null })
-      .mockResolvedValueOnce({ items: resources.slice(1, 2), total: 10, nextOffset: null })
-      .mockResolvedValueOnce({ items: resources.slice(2, 3), total: 10, nextOffset: null });
-
     const screen = renderCatalog();
-    await waitFor(() => expect(screen.getByText("Newest Resource")).toBeTruthy());
-    await waitFor(() => expect(screen.getByText("Cheapest Resource")).toBeTruthy());
-    await waitFor(() => expect(screen.getByText("Verified Resource")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Home section: Newest")).toBeTruthy());
+    expect(screen.getByText("Home section: Cheapest")).toBeTruthy();
+    expect(screen.getByText("Home section: Verified")).toBeTruthy();
   });
 
   it("hides HomeSections when searching", async () => {
@@ -513,12 +527,13 @@ describe("CatalogScreen HomeSections", () => {
 
     const screen = renderCatalog();
     await waitFor(() => expect(screen.getByText("Test Resource")).toBeTruthy());
+    expect(screen.getByText("Home section: Newest")).toBeTruthy();
 
     fireEvent.changeText(screen.getByLabelText("Search resources"), "search");
 
-    expect(screen.queryByText("Newest")).toBeNull();
-    expect(screen.queryByText("Cheapest")).toBeNull();
-    expect(screen.queryByText("Verified")).toBeNull();
+    expect(screen.queryByText("Home section: Newest")).toBeNull();
+    expect(screen.queryByText("Home section: Cheapest")).toBeNull();
+    expect(screen.queryByText("Home section: Verified")).toBeNull();
   });
 
   it("hides HomeSections when filter is active", async () => {
@@ -527,30 +542,27 @@ describe("CatalogScreen HomeSections", () => {
 
     const screen = renderCatalog();
     await waitFor(() => expect(screen.getByText("Test Resource")).toBeTruthy());
+    expect(screen.getByText("Home section: Newest")).toBeTruthy();
 
-    fireEvent.press(screen.getByText("Verified"));
+    fireEvent.press(screen.getByLabelText("Verified"));
 
-    expect(screen.queryByText("Newest")).toBeNull();
-    expect(screen.queryByText("Cheapest")).toBeNull();
-    expect(screen.queryByText("Verified")).toBeNull();
+    expect(screen.queryByText("Home section: Newest")).toBeNull();
+    expect(screen.queryByText("Home section: Cheapest")).toBeNull();
+    expect(screen.queryByText("Home section: Verified")).toBeNull();
   });
 
-  it("applies sort when 'See all' is pressed for Newest section", async () => {
+  it("applies sort when 'See all' is pressed for a section", async () => {
     const resources = [makeResource("new-1", "Newest Resource")];
-    mockedFetchCatalog
-      .mockResolvedValueOnce({ items: resources, total: 10, nextOffset: null })
-      .mockResolvedValueOnce({ items: resources, total: 10, nextOffset: null })
-      .mockResolvedValueOnce({ items: resources, total: 10, nextOffset: null });
+    mockedFetchCatalog.mockResolvedValue({ items: resources, total: 10, nextOffset: null });
 
     const screen = renderCatalog();
     await waitFor(() => expect(screen.getByText("Newest Resource")).toBeTruthy());
 
-    // Find and press "See all" for Newest section
-    fireEvent.press(screen.getByText("See all"));
+    fireEvent.press(screen.getByLabelText("See all cheapest resources"));
 
     await waitFor(() => {
       expect(mockedFetchCatalog).toHaveBeenCalledWith(
-        expect.objectContaining({ sort: "newest" })
+        expect.objectContaining({ sort: "price_asc" })
       );
     });
   });

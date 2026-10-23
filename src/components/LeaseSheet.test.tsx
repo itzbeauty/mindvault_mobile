@@ -2,7 +2,7 @@ import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { LeaseSheet } from "./LeaseSheet";
-import { quoteLease, type LeaseQuote } from "../api/leases";
+import { quoteLease, buyLease, type LeaseQuote } from "../api/leases";
 import type { Resource } from "../types";
 
 jest.mock("../api/leases", () => ({
@@ -14,12 +14,26 @@ jest.mock("../api/leases", () => ({
 jest.mock("../components/SignTransactionSheet", () => {
   const RN = jest.requireActual("react-native");
   return {
-    SignTransactionSheet: ({ visible, onCancel, onSigned }: any) => {
+    SignTransactionSheet: ({ visible, onCancel, onSigned, sign }: any) => {
       if (!visible) return null;
       return (
         <RN.View testID="sign-transaction-sheet">
           <RN.Text testID="sign-sheet-title">Sign Transaction Sheet</RN.Text>
-          <RN.Pressable testID="mock-sign-btn" onPress={() => onSigned("SIGNED_XDR")} />
+          <RN.Pressable
+            testID="mock-sign-btn"
+            onPress={async () => {
+              if (sign) {
+                try {
+                  const result = await sign("S-test-secret");
+                  await onSigned?.(result ?? "SIGNED_XDR");
+                } catch {
+                  // ignore
+                }
+              } else {
+                await onSigned?.("SIGNED_XDR");
+              }
+            }}
+          />
           <RN.Pressable testID="mock-sign-cancel" onPress={onCancel} />
         </RN.View>
       );
@@ -77,6 +91,7 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 const mockedQuoteLease = quoteLease as jest.MockedFunction<typeof quoteLease>;
+const mockedBuyLease = buyLease as jest.MockedFunction<typeof buyLease>;
 
 function createResource(overrides: Partial<Resource> = {}): Resource {
   return {
@@ -200,8 +215,7 @@ describe("LeaseSheet", () => {
     };
     mockedQuoteLease.mockResolvedValue(quote);
 
-    const { buyLease } = require("../api/leases");
-    buyLease.mockResolvedValue({
+    mockedBuyLease.mockResolvedValue({
       resourceId: "res-123",
       tier: 1,
       state: "Pending",

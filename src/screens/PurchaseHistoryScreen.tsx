@@ -271,7 +271,7 @@ function ReceiptRow({ receipt }: { receipt: PaymentReceipt & { source: "local" |
       <Text style={typography.body}>{paidOn}</Text>
       <Pressable
         onPress={(e) => {
-          e.stopPropagation();
+          e?.stopPropagation?.();
           handleOpenExplorer();
         }}
         style={rowStyles.link}

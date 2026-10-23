@@ -5,7 +5,7 @@ import type { AccessResult } from "../types";
 import { extractApiErrorMessage } from "../utils/errorLogger";
 import { parseResourceId } from "../utils/resourceLinks";
 import { saveReceipt } from "../services/receipts";
-import { DEFAULT_NETWORK_PASSPHRASE, DEFAULT_STELLAR_NETWORK } from "./resources";
+import { DEFAULT_NETWORK_PASSPHRASE, DEFAULT_STELLAR_NETWORK, getApiBaseUrl } from "./resources";
 
 /**
  * Client for the server's x402 v2 paywall (`@x402/express` with the

@@ -330,7 +330,7 @@ export function LeaseSheet({
                   Rent <Text style={{ fontWeight: "700" }}>{leaseTierLabel(quote.tier)}</Text> access for
                 </Text>
                 <Text style={{ fontSize: 24, fontWeight: "700", color: colors.primary, textAlign: "center" }}>
-                  {Number(quote.price) / 10_000_000} USDC
+                  {(Number(quote.price) / 10_000_000).toFixed(2)} USDC
                 </Text>
                 <View style={styles.creatorRow}>
                   <Text style={styles.creatorLabel}>Creator:</Text>
